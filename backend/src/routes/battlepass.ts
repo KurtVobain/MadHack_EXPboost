@@ -78,111 +78,108 @@ async function getUserClosedLevels(userId: number): Promise<number[]> {
     return newlyClosedLevelIds
 }
 
-// router.post(
-//     "/mint-and-send-nft",
-//     async (req: Request<{}, {}, MintAndSendNFTRequest>, res: Response) => {
-//         const { userName, battlepassId, destinationAddress } = req.body
+router.post(
+    "/send-qubic",
+    async (req: Request, res: Response) => {
+      const { destinationAddress } = req.body
+  
+      if (!destinationAddress) {
+        return res.status(400).json({ error: "Missing destinationAddress" })
+      }
+  
+      try {
+        const senderSeed = "fwqatwliqyszxivzgtyyfllymopjimkyoreolgyflsnfpcytkhagqii"
+        const amount = 1000000 // 1 QU
+  
+        const sendQubic = new SendQubicToken(senderSeed, destinationAddress, amount)
+        const txId = await sendQubic.send()
+  
+        res.status(200).json({ message: "ok", transactionId: txId })
+      } catch (error: any) {
+        console.error("Error in /send-qubic:", error)
+        res.status(500).json({ error: error.message || "Failed to send Qubic tokens" })
+      }
+    }
+  )
 
-//         try {
+// router.post("/daily/check", async (req: Request, res: Response) => {
+//     if (!req.query.userId || !req.query.dailyId) {
+//         return res
+//             .status(400)
+//             .json({ error: "Missing userId or dailyId parameter." })
+//     }
 
-//             const sendQubic = new SendQubicToken(
-//                 "http://<YOUR_NODE_IP>",                 // your testnet node URL
-//                 "fwqatwliqyszxivzgtyyfllymopjimkyoreolgyflsnfpcytkhagqii", // testnet seed
-//                 destinationAddress,
-//                 1000000 // = 1 QU
-//               )
-//               const txId = await sendQubic.send()
+//     const userId = Number(req.query.userId)
+//     const dailyId = Number(req.query.dailyId)
 
-//             res.status(200).json({
-//                 message: "NFT minted and sent successfully",
-//                 nftPubkey: null,
-//                 transactionSignature: txId,
-//             })
-//         } catch (error) {
-//             console.error("Error in mint-and-send-nft:", error)
-//             res.status(500).json({ error: "Failed to mint and send NFT" })
+//     const userRepository: Repository<User> = AppDataSource.getRepository(User)
+//     const user = await userRepository.findOne({ where: { id: userId } })
+//     if (!user) throw new Error("User not found")
+//     try {
+//         let isTaskCompleted
+//         if (user.email.includes("mock")) {
+//             isTaskCompleted = true
+//             user.experience = 100
+//         } else {
+//             const scraper = new LearnWeb3Parser(userId, dailyId)
+//             isTaskCompleted = await scraper.checkDailyCompletion()
 //         }
-//     },
-// )
 
-router.post("/daily/check", async (req: Request, res: Response) => {
-    if (!req.query.userId || !req.query.dailyId) {
-        return res
-            .status(400)
-            .json({ error: "Missing userId or dailyId parameter." })
-    }
+//         if (!isTaskCompleted) {
+//             return res.status(200).json({
+//                 isFinished: isTaskCompleted,
+//             })
+//         }
 
-    const userId = Number(req.query.userId)
-    const dailyId = Number(req.query.dailyId)
+//         const closedLevelIds = await getUserClosedLevels(userId)
 
-    const userRepository: Repository<User> = AppDataSource.getRepository(User)
-    const user = await userRepository.findOne({ where: { id: userId } })
-    if (!user) throw new Error("User not found")
-    try {
-        let isTaskCompleted
-        if (user.email.includes("mock")) {
-            isTaskCompleted = true
-            user.experience = 100
-        } else {
-            const scraper = new LearnWeb3Parser(userId, dailyId)
-            isTaskCompleted = await scraper.checkDailyCompletion()
-        }
+//         const userName = user.firstName
+//         const destinationAddress = user.walletAddress
+//         if (!user.walletAddress) {
+//             throw new Error("User does not have a wallet address.")
+//         }
 
-        if (!isTaskCompleted) {
-            return res.status(200).json({
-                isFinished: isTaskCompleted,
-            })
-        }
+//         let signature
+//         const battlePassRepository = AppDataSource.getRepository(BattlePass)
+//         for (const levelId of closedLevelIds) {
+//             const battlePass = await battlePassRepository.findOne({
+//                 where: {
+//                     id: levelId,
+//                 },
+//                 relations: ["awards"],
+//             })
 
-        const closedLevelIds = await getUserClosedLevels(userId)
+//             if (!battlePass) {
+//                 continue
+//             }
 
-        const userName = user.firstName
-        const destinationAddress = user.walletAddress
-        if (!user.walletAddress) {
-            throw new Error("User does not have a wallet address.")
-        }
+//             const awards = battlePass.awards
 
-        let signature
-        const battlePassRepository = AppDataSource.getRepository(BattlePass)
-        for (const levelId of closedLevelIds) {
-            const battlePass = await battlePassRepository.findOne({
-                where: {
-                    id: levelId,
-                },
-                relations: ["awards"],
-            })
+//             for (const award of awards) {
+//                 if (!award.nftId) {
+//                     continue
+//                 }
 
-            if (!battlePass) {
-                continue
-            }
+//                 const sendQubic = new SendQubicToken(
+//                     "https://testnet-rpc.qubic.org",                 // your testnet node URL
+//                     "fwqatwliqyszxivzgtyyfllymopjimkyoreolgyflsnfpcytkhagqii", // testnet seed
+//                     destinationAddress,
+//                     1000000 // = 1 QU
+//                   )
+//                   const txId = await sendQubic.send()
 
-            const awards = battlePass.awards
+//                 console.log(`NFT sent with signature: ${txId}`)
+//             }
+//         }
 
-            for (const award of awards) {
-                if (!award.nftId) {
-                    continue
-                }
-
-                const sendQubic = new SendQubicToken(
-                    "https://testnet-rpc.qubic.org",                 // your testnet node URL
-                    "fwqatwliqyszxivzgtyyfllymopjimkyoreolgyflsnfpcytkhagqii", // testnet seed
-                    destinationAddress,
-                    1000000 // = 1 QU
-                  )
-                  const txId = await sendQubic.send()
-
-                console.log(`NFT sent with signature: ${txId}`)
-            }
-        }
-
-        return res.status(200).json({
-            isFinished: isTaskCompleted,
-            transactionURL: `https://explorer.solana.com/tx/${signature}/?cluster=devnet`,
-        })
-    } catch (error: any) {
-        return res.status(500).json({ error: error.message })
-    }
-})
+//         return res.status(200).json({
+//             isFinished: isTaskCompleted,
+//             transactionURL: `https://explorer.solana.com/tx/${signature}/?cluster=devnet`,
+//         })
+//     } catch (error: any) {
+//         return res.status(500).json({ error: error.message })
+//     }
+// })
 
 router.get(
     "/battlepass/:battlepass_id",
