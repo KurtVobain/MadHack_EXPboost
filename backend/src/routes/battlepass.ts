@@ -1,6 +1,5 @@
 import { Repository } from "typeorm"
 import express, { Request, Response } from "express"
-import MintSolanaNFTService from "../services/MintNFT"
 import SendQubicToken from "../services/SendQubic"
 import LearnWeb3Parser from "../services/checkLearnWeb3"
 import { User } from "../entities/User"
@@ -79,39 +78,32 @@ async function getUserClosedLevels(userId: number): Promise<number[]> {
     return newlyClosedLevelIds
 }
 
-router.post(
-    "/mint-and-send-nft",
-    async (req: Request<{}, {}, MintAndSendNFTRequest>, res: Response) => {
-        const { userName, battlepassId, destinationAddress } = req.body
+// router.post(
+//     "/mint-and-send-nft",
+//     async (req: Request<{}, {}, MintAndSendNFTRequest>, res: Response) => {
+//         const { userName, battlepassId, destinationAddress } = req.body
 
-        try {
-            const mintService = new MintSolanaNFTService(
-                userName,
-                battlepassId,
-                "image.png",
-            )
+//         try {
 
-            const nftPubkey = await mintService.mintNft()
+//             const sendQubic = new SendQubicToken(
+//                 "http://<YOUR_NODE_IP>",                 // your testnet node URL
+//                 "fwqatwliqyszxivzgtyyfllymopjimkyoreolgyflsnfpcytkhagqii", // testnet seed
+//                 destinationAddress,
+//                 1000000 // = 1 QU
+//               )
+//               const txId = await sendQubic.send()
 
-            const sendQubic = new SendQubicToken(
-                "http://<YOUR_NODE_IP>",                 // your testnet node URL
-                "fwqatwliqyszxivzgtyyfllymopjimkyoreolgyflsnfpcytkhagqii", // testnet seed
-                destinationAddress,
-                1000000 // = 1 QU
-              )
-              const txId = await sendQubic.send()
-
-            res.status(200).json({
-                message: "NFT minted and sent successfully",
-                nftPubkey,
-                transactionSignature: txId,
-            })
-        } catch (error) {
-            console.error("Error in mint-and-send-nft:", error)
-            res.status(500).json({ error: "Failed to mint and send NFT" })
-        }
-    },
-)
+//             res.status(200).json({
+//                 message: "NFT minted and sent successfully",
+//                 nftPubkey: null,
+//                 transactionSignature: txId,
+//             })
+//         } catch (error) {
+//             console.error("Error in mint-and-send-nft:", error)
+//             res.status(500).json({ error: "Failed to mint and send NFT" })
+//         }
+//     },
+// )
 
 router.post("/daily/check", async (req: Request, res: Response) => {
     if (!req.query.userId || !req.query.dailyId) {
@@ -170,24 +162,16 @@ router.post("/daily/check", async (req: Request, res: Response) => {
                 if (!award.nftId) {
                     continue
                 }
-                // Proceed with NFT minting and sending
-                const mintService = new MintSolanaNFTService(
-                    userName,
-                    battlePass.id,
-                    award.nftId,
-                )
 
-                const nftPubkey = await mintService.mintNft()
-
-                const sendNFTService = new SendNFT(
+                const sendQubic = new SendQubicToken(
+                    "https://testnet-rpc.qubic.org",                 // your testnet node URL
+                    "fwqatwliqyszxivzgtyyfllymopjimkyoreolgyflsnfpcytkhagqii", // testnet seed
                     destinationAddress,
-                    nftPubkey,
-                    1,
-                )
+                    1000000 // = 1 QU
+                  )
+                  const txId = await sendQubic.send()
 
-                signature = await sendNFTService.sendToken()
-
-                console.log(`NFT sent with signature: ${signature}`)
+                console.log(`NFT sent with signature: ${txId}`)
             }
         }
 

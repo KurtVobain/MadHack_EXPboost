@@ -1,5 +1,5 @@
-import { QubicConnector } from "@qubic-lib/qubic-ts-library/dist/QubicConnector"
-import { QubicHelper } from "@qubic-lib/qubic-ts-library/dist/qubicHelper"
+import { QubicHelper } from '@qubic-lib/qubic-ts-library/dist/qubicHelper'
+import { QubicConnector } from '@qubic-lib/qubic-ts-library/dist/qubicConnector'
 
 
 class SendQubicToken {
