@@ -42,6 +42,7 @@ const LoginPage: React.FC<LoginPageProps> = ({}) => {
       walletAddress,
       learnWeb3url: learnWeb3Url,
     };
+
     axios
       .post(`api/auth/register`, data)
       .then((response) => {
@@ -50,7 +51,7 @@ const LoginPage: React.FC<LoginPageProps> = ({}) => {
         navigate("/dashboard", { state: { user_id: id } });
       })
       .catch((error) => {
-        console.log(error);
+        console.log(error, error.response);
       });
   }, [email, password, firstName, lastName, walletAddress, learnWeb3Url]);
 
