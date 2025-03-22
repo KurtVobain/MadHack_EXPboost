@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+    backend:
+        build:
+            context: ./backend
+            dockerfile: Dockerfile
+        container_name: backend
+        ports:
+            - "3000:3000"
+        depends_on:
+            - db
+        env_file:
+            - .env
+        environment:
+            - NODE_ENV=docker
+            - DATABASE_URL=postgresql://expboost:mypassword@db:5432/expboost
+        networks:
+            - app-network
+        # volumes:
+        #     - ./backend:/usr/src/app
+        #     - /usr/src/app/node_modules
+        command: npm run start
+
+    frontend:
+        build:
+            context: ./Front-end
+            dockerfile: Dockerfile
+        container_name: frontend
+        ports:
+            - "80:80" # Access frontend via http://localhost/
+        depends_on:
+            - backend
+        env_file:
+            - .env
+        environment:
+            - VITE_API_URL=http://backend:3000/api # Vite environment variable
+        networks:
+            - app-network
+
+    db:
+        image: postgres:13-alpine
+        container_name: db
+        environment:
+            POSTGRES_USER: expboost
+            POSTGRES_PASSWORD: mypassword
+            POSTGRES_DB: expboost
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        ports:
+            - "5432:5432"
+        networks:
+            - app-network
+
+networks:
+    app-network:
+        driver: bridge
+
+volumes:
+    postgres_data:
