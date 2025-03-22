@@ -24,7 +24,7 @@ services:
 
     frontend:
         build:
-            context: ./Front-end
+            context: ./frontend
             dockerfile: Dockerfile
         container_name: frontend
         ports:
