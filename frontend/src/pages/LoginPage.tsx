@@ -43,7 +43,7 @@ const LoginPage: React.FC<LoginPageProps> = ({}) => {
       learnWeb3url: learnWeb3Url,
     };
     axios
-      .post(`${hostname}/auth/register`, data)
+      .post(`api/auth/register`, data)
       .then((response) => {
         const id = response.data.user.id;
         setUserId(id);
@@ -65,7 +65,7 @@ const LoginPage: React.FC<LoginPageProps> = ({}) => {
       password: loginPassword,
     };
     axios
-      .post(`${hostname}/auth/login`, data)
+      .post(`api/auth/login`, data)
       .then((response) => {
         const id = response.data.user.id;
         setUserId(id);
@@ -87,7 +87,7 @@ const LoginPage: React.FC<LoginPageProps> = ({}) => {
       mock: true
     };
     axios
-      .post(`${hostname}/auth/register`, data)
+      .post(`api/auth/register`, data)
       .then((response) => {
         const id = response.data.user.id;
         setUserId(id);

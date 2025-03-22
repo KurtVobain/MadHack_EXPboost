@@ -4,7 +4,7 @@ import { config } from "./config"
 
 dotenv.config()
 
-const isProduction = process.env.NODE_ENV === "production"
+const isProduction = "production"
 
 const AppDataSource = new DataSource(
     isProduction

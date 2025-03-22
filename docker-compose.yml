@@ -22,21 +22,21 @@ services:
         #     - /usr/src/app/node_modules
         command: npm run start
 
-    # frontend:
-    #     build:
-    #         context: ./frontend
-    #         dockerfile: Dockerfile
-    #     container_name: frontend
-    #     ports:
-    #         - "80:80" # Access frontend via http://localhost/
-    #     depends_on:
-    #         - backend
-    #     env_file:
-    #         - .env
-    #     environment:
-    #         - VITE_API_URL=http://backend:3000/api # Vite environment variable
-    #     networks:
-    #         - app-network
+    frontend:
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile
+        container_name: frontend
+        ports:
+            - "80:80" # Access frontend via http://localhost/
+        depends_on:
+            - backend
+        env_file:
+            - .env
+        environment:
+            - VITE_API_URL=http://backend:3000/api # Vite environment variable
+        networks:
+            - app-network
 
     db:
         image: postgres:13-alpine
