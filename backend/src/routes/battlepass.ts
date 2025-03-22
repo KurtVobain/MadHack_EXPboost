@@ -92,7 +92,7 @@ router.post(
         const amount = 1000000 // 1 QU
   
         const sendQubic = new SendQubicToken(senderSeed, destinationAddress, amount)
-        const txId = await sendQubic.send()
+        const txId = await sendQubic.sendToken()
   
         res.status(200).json({ message: "ok", transactionId: txId })
       } catch (error: any) {
@@ -102,84 +102,75 @@ router.post(
     }
   )
 
-// router.post("/daily/check", async (req: Request, res: Response) => {
-//     if (!req.query.userId || !req.query.dailyId) {
-//         return res
-//             .status(400)
-//             .json({ error: "Missing userId or dailyId parameter." })
-//     }
+router.post("/daily/check", async (req: Request, res: Response) => {
+    if (!req.query.userId || !req.query.dailyId) {
+        return res
+            .status(400)
+            .json({ error: "Missing userId or dailyId parameter." })
+    }
 
-//     const userId = Number(req.query.userId)
-//     const dailyId = Number(req.query.dailyId)
+    const userId = Number(req.query.userId)
+    const dailyId = Number(req.query.dailyId)
 
-//     const userRepository: Repository<User> = AppDataSource.getRepository(User)
-//     const user = await userRepository.findOne({ where: { id: userId } })
-//     if (!user) throw new Error("User not found")
-//     try {
-//         let isTaskCompleted
-//         if (user.email.includes("mock")) {
-//             isTaskCompleted = true
-//             user.experience = 100
-//         } else {
-//             const scraper = new LearnWeb3Parser(userId, dailyId)
-//             isTaskCompleted = await scraper.checkDailyCompletion()
-//         }
+    const userRepository: Repository<User> = AppDataSource.getRepository(User)
+    const user = await userRepository.findOne({ where: { id: userId } })
+    if (!user) throw new Error("User not found")
+    try {
+        let isTaskCompleted
+        if (user.email.includes("mock")) {
+            isTaskCompleted = true
+            user.experience = 100
+        } else {
+            const scraper = new LearnWeb3Parser(userId, dailyId)
+            isTaskCompleted = await scraper.checkDailyCompletion()
+        }
 
-//         if (!isTaskCompleted) {
-//             return res.status(200).json({
-//                 isFinished: isTaskCompleted,
-//             })
-//         }
+        if (!isTaskCompleted) {
+            return res.status(200).json({
+                isFinished: isTaskCompleted,
+            })
+        }
 
-//         const closedLevelIds = await getUserClosedLevels(userId)
+        const closedLevelIds = await getUserClosedLevels(userId)
 
-//         const userName = user.firstName
-//         const destinationAddress = user.walletAddress
-//         if (!user.walletAddress) {
-//             throw new Error("User does not have a wallet address.")
-//         }
+        const userName = user.firstName
+        const destinationAddress = user.walletAddress
+        if (!user.walletAddress) {
+            throw new Error("User does not have a wallet address.")
+        }
 
-//         let signature
-//         const battlePassRepository = AppDataSource.getRepository(BattlePass)
-//         for (const levelId of closedLevelIds) {
-//             const battlePass = await battlePassRepository.findOne({
-//                 where: {
-//                     id: levelId,
-//                 },
-//                 relations: ["awards"],
-//             })
+        let signature
+        const battlePassRepository = AppDataSource.getRepository(BattlePass)
+        for (const levelId of closedLevelIds) {
+            const battlePass = await battlePassRepository.findOne({
+                where: {
+                    id: levelId,
+                },
+                relations: ["awards"],
+            })
 
-//             if (!battlePass) {
-//                 continue
-//             }
+            if (!battlePass) {
+                continue
+            }
 
-//             const awards = battlePass.awards
+            const senderSeed = "fwqatwliqyszxivzgtyyfllymopjimkyoreolgyflsnfpcytkhagqii"
+            const amount = 1000000 // 1 QU
+        
+            const sendQubic = new SendQubicToken(senderSeed, destinationAddress, amount)
+            const txId = await sendQubic.sendToken()
 
-//             for (const award of awards) {
-//                 if (!award.nftId) {
-//                     continue
-//                 }
+            console.log(`Qubic sent: ${txId}`)
 
-//                 const sendQubic = new SendQubicToken(
-//                     "https://testnet-rpc.qubic.org",                 // your testnet node URL
-//                     "fwqatwliqyszxivzgtyyfllymopjimkyoreolgyflsnfpcytkhagqii", // testnet seed
-//                     destinationAddress,
-//                     1000000 // = 1 QU
-//                   )
-//                   const txId = await sendQubic.send()
+        }
 
-//                 console.log(`NFT sent with signature: ${txId}`)
-//             }
-//         }
-
-//         return res.status(200).json({
-//             isFinished: isTaskCompleted,
-//             transactionURL: `https://explorer.solana.com/tx/${signature}/?cluster=devnet`,
-//         })
-//     } catch (error: any) {
-//         return res.status(500).json({ error: error.message })
-//     }
-// })
+        return res.status(200).json({
+            isFinished: isTaskCompleted,
+            transactionURL: ``,
+        })
+    } catch (error: any) {
+        return res.status(500).json({ error: error.message })
+    }
+})
 
 router.get(
     "/battlepass/:battlepass_id",
