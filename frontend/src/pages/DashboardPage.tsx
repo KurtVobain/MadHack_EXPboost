@@ -32,7 +32,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({  }) => {
     if (isLoading) {
       return;
     }
-    axios.get(`${hostname}/profile/${userId}`)
+    axios.get(`api/profile/${userId}`)
       .then((response) => {
         setUserState(response.data.data);
       })
@@ -40,7 +40,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({  }) => {
         console.log(error);
       });
 
-      axios.get(`${hostname}/dailies`, { params: { userId: userId }
+      axios.get(`api/dailies`, { params: { userId: userId }
       }).then((response) => {
         setDaylis(response.data.data);
       }).catch((error) => {
@@ -51,7 +51,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({  }) => {
     
 
   useEffect(() => {
-    axios.get(`${hostname}/profile/${userId}`)
+    axios.get(`api/profile/${userId}`)
       .then((response) => {
         setUserState(response.data.data);
       })
@@ -59,14 +59,14 @@ const DashboardPage: React.FC<DashboardPageProps> = ({  }) => {
         console.log(error);
       });
 
-    axios.get(`${hostname}/battlepass/${userId}`, {
+    axios.get(`api/battlepass/${userId}`, {
       }).then((response) => {
         setLevels(response.data.data.levels);
       }).catch((error) => {
         setLevels(mockLevels);
         console.log(error);
       });
-    axios.get(`${hostname}/dailies`, { params: { userId: userId }
+    axios.get(`api/dailies`, { params: { userId: userId }
       }).then((response) => {
         setDaylis(response.data.data);
       }).catch((error) => {
@@ -76,7 +76,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({  }) => {
 
   const checkDaily = useCallback((dailyId: number) => {
     setIsLoading(true);
-    axios.post(`${hostname}/daily/check?userId=${userId}&dailyId=${dailyId}`, {
+    axios.post(`api/daily/check?userId=${userId}&dailyId=${dailyId}`, {
     }).then((response) => {
 
       alert(`Your transaction URL:  ${response.data.transactionURL}`);
