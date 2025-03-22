@@ -1,0 +1,12 @@
+{
+    "type": "postgres",
+    "url": "postgresql://expboost:mypassword@db:5432/expboost",
+    "synchronize": false,
+    "logging": false,
+    "entities": ["dist/entities/**/*.js"],
+    "migrations": ["dist/migrations/**/*.js"],
+    "cli": {
+        "migrationsDir": "src/migrations",
+        "entitiesDir": "src/entities"
+    }
+}
