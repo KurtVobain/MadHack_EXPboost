@@ -1,7 +1,7 @@
 import { Repository } from "typeorm"
 import express, { Request, Response } from "express"
 import MintSolanaNFTService from "../services/MintNFT"
-import SendNFT from "../services/SendSolanaToken"
+import SendQubicToken from "../services/SendQubic"
 import LearnWeb3Parser from "../services/checkLearnWeb3"
 import { User } from "../entities/User"
 import { BattlePass } from "../entities/BattlePass"
@@ -93,14 +93,18 @@ router.post(
 
             const nftPubkey = await mintService.mintNft()
 
-            const sendNFTService = new SendNFT(destinationAddress, nftPubkey, 1)
-
-            const signature = await sendNFTService.sendToken()
+            const sendQubic = new SendQubicToken(
+                "http://<YOUR_NODE_IP>",                 // your testnet node URL
+                "fwqatwliqyszxivzgtyyfllymopjimkyoreolgyflsnfpcytkhagqii", // testnet seed
+                destinationAddress,
+                1000000 // = 1 QU
+              )
+              const txId = await sendQubic.send()
 
             res.status(200).json({
                 message: "NFT minted and sent successfully",
                 nftPubkey,
-                transactionSignature: signature,
+                transactionSignature: txId,
             })
         } catch (error) {
             console.error("Error in mint-and-send-nft:", error)
