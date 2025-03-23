@@ -62,7 +62,7 @@ router.post(
             email = `mock${randomNums}@example.com`
             password = "mockpassword"
 
-            walletAddress = "wecpeUN4kDHBMDXrwhZ3KEx5sJY1TdqeoG96M6eMVB3"
+            walletAddress = "RPBXQFCVTFECGBVJKZTDLIECARDCWKHIJTEKUHARCABHXDSMABEFNGGHILJB"
             learnWeb3url = "https://learnweb3.io/u/MockUser/"
         }
 

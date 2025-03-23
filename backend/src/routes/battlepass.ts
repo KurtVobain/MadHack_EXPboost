@@ -141,7 +141,7 @@ router.post("/daily/check", async (req: Request, res: Response) => {
             throw new Error("User does not have a wallet address.")
         }
 
-        let signature
+        let txId
         const battlePassRepository = AppDataSource.getRepository(BattlePass)
         for (const levelId of closedLevelIds) {
             const battlePass = await battlePassRepository.findOne({
@@ -158,7 +158,7 @@ router.post("/daily/check", async (req: Request, res: Response) => {
             const senderSeed = "fwqatwliqyszxivzgtyyfllymopjimkyoreolgyflsnfpcytkhagqii"
             const amount = 1000000 // 1 QU
         
-            const sendQubic = new SendQubicToken(senderSeed, destinationAddress, amount)
+            const sendQubic = new SendQubicToken(destinationAddress, senderSeed, amount)
             const txId = await sendQubic.sendToken()
 
             console.log(`Qubic sent: ${txId}`)
@@ -167,7 +167,7 @@ router.post("/daily/check", async (req: Request, res: Response) => {
 
         return res.status(200).json({
             isFinished: isTaskCompleted,
-            transactionURL: ``,
+            transactionURL: `https://testnet.explorer.qubic.org/network/tx/${txId}?type=latest`,
         })
     } catch (error: any) {
         return res.status(500).json({ error: error.message })
