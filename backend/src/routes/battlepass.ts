@@ -1,7 +1,6 @@
 import { Repository } from "typeorm"
 import express, { Request, Response } from "express"
-import MintSolanaNFTService from "../services/MintNFT"
-import SendNFT from "../services/SendSolanaToken"
+import SendQubicToken from "../services/SendQubic"
 import LearnWeb3Parser from "../services/checkLearnWeb3"
 import { User } from "../entities/User"
 import { BattlePass } from "../entities/BattlePass"
@@ -80,34 +79,30 @@ async function getUserClosedLevels(userId: number): Promise<number[]> {
 }
 
 router.post(
-    "/mint-and-send-nft",
-    async (req: Request<{}, {}, MintAndSendNFTRequest>, res: Response) => {
-        const { userName, battlepassId, destinationAddress } = req.body
-
-        try {
-            const mintService = new MintSolanaNFTService(
-                userName,
-                battlepassId,
-                "image.png",
-            )
-
-            const nftPubkey = await mintService.mintNft()
-
-            const sendNFTService = new SendNFT(destinationAddress, nftPubkey, 1)
-
-            const signature = await sendNFTService.sendToken()
-
-            res.status(200).json({
-                message: "NFT minted and sent successfully",
-                nftPubkey,
-                transactionSignature: signature,
-            })
-        } catch (error) {
-            console.error("Error in mint-and-send-nft:", error)
-            res.status(500).json({ error: "Failed to mint and send NFT" })
-        }
-    },
-)
+    "/send-qubic",
+    async (req: Request, res: Response) => {
+      const { destinationAddress } = req.body
+  
+      if (!destinationAddress) {
+        return res.status(400).json({ error: "Missing destinationAddress" })
+      }
+  
+      try {
+        const senderSeed = "fwqatwliqyszxivzgtyyfllymopjimkyoreolgyflsnfpcytkhagqii"
+        const amount = 1000000 // 1 QU
+        console.log("Sending 1 QU to", destinationAddress)
+        const sendQubic = new SendQubicToken(destinationAddress, senderSeed, amount)
+        console.log("Sending Qubic token...", sendQubic)
+        const txId = await sendQubic.sendToken()
+        console.log("Qubic sent:", txId)
+  
+        res.status(200).json({ message: "ok", transactionId: txId })
+      } catch (error: any) {
+        console.error("Error in /send-qubic:", error)
+        res.status(500).json({ error: error.message || "Failed to send Qubic tokens" })
+      }
+    }
+  )
 
 router.post("/daily/check", async (req: Request, res: Response) => {
     if (!req.query.userId || !req.query.dailyId) {
@@ -146,7 +141,7 @@ router.post("/daily/check", async (req: Request, res: Response) => {
             throw new Error("User does not have a wallet address.")
         }
 
-        let signature
+        let txId
         const battlePassRepository = AppDataSource.getRepository(BattlePass)
         for (const levelId of closedLevelIds) {
             const battlePass = await battlePassRepository.findOne({
@@ -160,36 +155,19 @@ router.post("/daily/check", async (req: Request, res: Response) => {
                 continue
             }
 
-            const awards = battlePass.awards
+            const senderSeed = "fwqatwliqyszxivzgtyyfllymopjimkyoreolgyflsnfpcytkhagqii"
+            const amount = 1000000 // 1 QU
+        
+            const sendQubic = new SendQubicToken(destinationAddress, senderSeed, amount)
+            txId = await sendQubic.sendToken()
 
-            for (const award of awards) {
-                if (!award.nftId) {
-                    continue
-                }
-                // Proceed with NFT minting and sending
-                const mintService = new MintSolanaNFTService(
-                    userName,
-                    battlePass.id,
-                    award.nftId,
-                )
+            console.log(`Qubic sent: ${txId}`)
 
-                const nftPubkey = await mintService.mintNft()
-
-                const sendNFTService = new SendNFT(
-                    destinationAddress,
-                    nftPubkey,
-                    1,
-                )
-
-                signature = await sendNFTService.sendToken()
-
-                console.log(`NFT sent with signature: ${signature}`)
-            }
         }
 
         return res.status(200).json({
             isFinished: isTaskCompleted,
-            transactionURL: `https://explorer.solana.com/tx/${signature}/?cluster=devnet`,
+            transactionURL: `https://testnet.explorer.qubic.org/network/tx/${txId}?type=latest`,
         })
     } catch (error: any) {
         return res.status(500).json({ error: error.message })
