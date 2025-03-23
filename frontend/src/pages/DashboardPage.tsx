@@ -28,7 +28,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({}) => {
 
   const userId = userIdStore((state) => state.userId);
 
-  const [showModal, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(false);
 
   const closeModal = () => {
     setShowModal(false);
