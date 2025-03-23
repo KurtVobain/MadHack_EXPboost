@@ -159,7 +159,7 @@ router.post("/daily/check", async (req: Request, res: Response) => {
             const amount = 1000000 // 1 QU
         
             const sendQubic = new SendQubicToken(destinationAddress, senderSeed, amount)
-            const txId = await sendQubic.sendToken()
+            txId = await sendQubic.sendToken()
 
             console.log(`Qubic sent: ${txId}`)
 
