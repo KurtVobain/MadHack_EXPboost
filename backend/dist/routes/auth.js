@@ -45,7 +45,7 @@ router.post("/auth/register", [
         .withMessage("Password must be at least 6 characters"),
     (0, express_validator_1.body)("walletAddress")
         .notEmpty()
-        .withMessage("Solana wallet address is required"),
+        .withMessage("Wallet address is required"),
     (0, express_validator_1.body)("learnWeb3url")
         .notEmpty()
         .withMessage("LearnWeb3 profile url is required"),
