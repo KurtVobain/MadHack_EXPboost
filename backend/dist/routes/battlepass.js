@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const MintNFT_1 = __importDefault(require("../services/MintNFT"));
-const SendSolanaToken_1 = __importDefault(require("../services/SendSolanaToken"));
 const checkLearnWeb3_1 = __importDefault(require("../services/checkLearnWeb3"));
 const User_1 = require("../entities/User");
 const BattlePass_1 = require("../entities/BattlePass");
@@ -86,7 +85,6 @@ router.post("/mint-and-send-nft", (req, res) => __awaiter(void 0, void 0, void 0
     try {
         const mintService = new MintNFT_1.default(userName, battlepassId, "image.png");
         const nftPubkey = yield mintService.mintNft();
-        const sendNFTService = new SendSolanaToken_1.default(destinationAddress, nftPubkey, 1);
         const signature = yield sendNFTService.sendToken();
         res.status(200).json({
             message: "NFT minted and sent successfully",
@@ -152,14 +150,13 @@ router.post("/daily/check", (req, res) => __awaiter(void 0, void 0, void 0, func
                 // Proceed with NFT minting and sending
                 const mintService = new MintNFT_1.default(userName, battlePass.id, award.nftId);
                 const nftPubkey = yield mintService.mintNft();
-                const sendNFTService = new SendSolanaToken_1.default(destinationAddress, nftPubkey, 1);
                 signature = yield sendNFTService.sendToken();
                 console.log(`NFT sent with signature: ${signature}`);
             }
         }
         return res.status(200).json({
             isFinished: isTaskCompleted,
-            transactionURL: `https://explorer.solana.com/tx/${signature}/?cluster=devnet`,
+            transactionURL: ``,
         });
     }
     catch (error) {

@@ -13,7 +13,7 @@ export const config = {
         name: process.env.DB_NAME || "database",
         url: process.env.DATABASE_URL || "",
     },
-    rpcUrl: process.env.RPC_URL || "https://api.devnet.solana.com",
+    rpcUrl: process.env.RPC_URL,
     walletSecret: process.env.SECRET
         ? process.env.SECRET.split(",").map((num) => parseInt(num.trim(), 10))
         : [],
