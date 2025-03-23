@@ -125,6 +125,9 @@ const LoginPage: React.FC<LoginPageProps> = ({}) => {
     <div className="">
       <div className="h-screen flex flex-col gap-8 items-center justify-center">
         <div className="flex flex-col gap-2 w-full items-center">
+          <div onClick={handleClickGuest} className="mb-2 bg-[#FF7423] text-white p-2 rounded-md w-72 text-center cursor-pointer">
+            Sign in as a guest
+          </div>
           <div onClick={handleClickMetamask} className="flex flex-row gap-2 bg-[#FF7423] text-white p-2 rounded-md w-72 text-center cursor-pointer items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 142 137"  width="30" height="30">
               <path fill="#0A0A0A" d="m131.215 130.727-29.976-8.883-22.604 13.449H62.861l-22.619-13.449-29.96 8.883-9.11-30.63 9.117-33.992-9.117-28.742 9.11-35.618 46.817 27.847h27.298l46.818-27.847 9.117 35.618-9.117 28.742 9.117 33.992-9.117 30.63Z"/>
