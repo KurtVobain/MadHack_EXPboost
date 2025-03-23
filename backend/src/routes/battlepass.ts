@@ -90,9 +90,11 @@ router.post(
       try {
         const senderSeed = "fwqatwliqyszxivzgtyyfllymopjimkyoreolgyflsnfpcytkhagqii"
         const amount = 1000000 // 1 QU
-  
-        const sendQubic = new SendQubicToken(senderSeed, destinationAddress, amount)
+        console.log("Sending 1 QU to", destinationAddress)
+        const sendQubic = new SendQubicToken(destinationAddress, senderSeed, amount)
+        console.log("Sending Qubic token...", sendQubic)
         const txId = await sendQubic.sendToken()
+        console.log("Qubic sent:", txId)
   
         res.status(200).json({ message: "ok", transactionId: txId })
       } catch (error: any) {
